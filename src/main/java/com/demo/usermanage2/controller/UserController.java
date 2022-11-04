@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/users")
@@ -30,8 +32,17 @@ public class UserController {
     public String viewPage(Model model, @PathVariable(name="pageNum") int pageNum,
                            @RequestParam(value = "sortField", required = false) String sortField,
                            @RequestParam(value = "sortDirection", required = false) String sortDirection ) {
+        Map<String, String> myMap = new HashMap<>();
 
-        Page<User> page = userService.listAll(pageNum, sortField, sortDirection);
+        String[] fields = sortField.split(",");
+
+        String[] directions = sortDirection.split(",");
+
+        for(int i=0; i < fields.length; i++){
+            myMap.put(fields[i], directions[i]);
+        }
+
+        Page<User> page = userService.listAll(pageNum, myMap);
 
         List<User> listUsers = page.getContent();
 
@@ -49,6 +60,29 @@ public class UserController {
     }
 
 
+//    @GetMapping("/list/{pageNum}")
+//    public String viewPage(Model model, @PathVariable(name="pageNum") int pageNum,
+//                           @RequestParam(value = "sortField", required = false) String sortField,
+//                           @RequestParam(value = "sortDirection", required = false) String sortDirection ) {
+//
+//        Page<User> page = userService.listAll(pageNum, sortField, sortDirection);
+//
+//        List<User> listUsers = page.getContent();
+//
+//        model.addAttribute("currentPage", pageNum);
+//        model.addAttribute("totalPages", page.getTotalPages());
+//        model.addAttribute("totalItems", page.getTotalElements());
+//
+//        model.addAttribute("sortField", sortField);
+//        model.addAttribute("sortDir", sortDirection);
+//        model.addAttribute("reverseSortDir", sortDirection.equals("asc") ? "desc" : "asc");
+//
+//        model.addAttribute("users", listUsers);
+//
+//        return "list";
+//    }
+
+
     @GetMapping("/list/add")
     public String add(Model model) {
         User user = new User();
@@ -57,7 +91,7 @@ public class UserController {
         return "form";
     }
 
-    @GetMapping("/list/{id}/edit")
+    @GetMapping("/list/edit/{id}")
     public String edit(@PathVariable("id") Long id, Model model) {
         model.addAttribute("user", userService.findOne(id));
         return "form";
@@ -77,7 +111,7 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-    @GetMapping("/list/{id}/delete")
+    @GetMapping("/list/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes redirect) {
         userService.delete(id);
         redirect.addFlashAttribute("successMessage", "Deleted contact successfully!");

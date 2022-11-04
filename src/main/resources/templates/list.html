@@ -8,8 +8,8 @@
 <div class="container" id="main-content">
     <div class="row">
         <div class="col-6 no-padding">
-            <form class="form-inline" action="#" th:action="@{/list/search}" method="get">
-                <input class="form-control mr-sm-2" type="search" name="term" placeholder="Search by name ..." />
+            <form class="form-inline" action="#" th:action="@{/users/list/search}" method="get">
+                <input class="form-control mr-sm-2" type="search" name="term" placeholder="Search by ..." />
                 <button class="btn btn-primary" type="submit">
                     <i class="fa fa-search"></i> Search
                 </button>
@@ -60,10 +60,10 @@
                         <td th:text="${user.email}"></td>
                         <td th:text="${user.age}"></td>
                         <td>
-                            <a href="#" th:href="@{/users/list/{id}/edit(id=${user.id})}" class="mr-sm-2 text-primary">
+                            <a href="#" th:href="@{/users/list/edit/{id}(id=${user.id})}" class="mr-sm-2 text-primary">
                                 <i class="fa fa-pencil"></i>
                             </a>
-                            <a href="#" th:href="@{/users/list/{id}/delete(id=${user.id})}" class="text-danger">
+                            <a href="#" th:href="@{/users/list/delete/{id}(id=${user.id})}" class="text-danger">
                                 <i class="fa fa-trash"></i>
                             </a>
                         </td>
