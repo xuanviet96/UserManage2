@@ -3,17 +3,23 @@
 <head th:replace="layout :: head"></head>
 
 <body>
+<style>
+    .sort-btn {
+        cursor: pointer;
+    }
+</style>
 <nav th:replace="layout :: header"></nav>
 
 <div class="container" id="main-content">
     <div class="row">
         <div class="col-6 no-padding">
-            <form class="form-inline" action="#" th:action="@{/users/list/search}" method="get">
-                <input class="form-control mr-sm-2" type="search" name="term" placeholder="Search by ..." />
-                <button class="btn btn-primary" type="submit">
+<!--            <form class="form-inline" action="#" th:action="@{/users/list}" method="get">-->
+                <input value="" class="form-control mr-sm-2" type="search" name="term" placeholder="Search by ..." />
+
+                <button class="btn btn-primary search-button" type="submit">
                     <i class="fa fa-search"></i> Search
                 </button>
-            </form>
+<!--            </form>-->
         </div>
 
         <div class="col-6 no-padding">
@@ -31,8 +37,6 @@
             </button>
         </div>
 
-        //TODO: check xem list users is empty ?
-
         <th:block th:if="${#lists.isEmpty(users)}">
             <h5>No contacts</h5>
         </th:block>
@@ -43,11 +47,29 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Age</th>
+                        <th>ID <span class="sort-btn" data-attr="id" data-direction=""></span> </th>
+                        <th>First Name <span class="sort-btn" data-attr="firstName" data-direction=""></span></th>
+                        <th>Last Name <span class="sort-btn" data-attr="lastName" data-direction=""></span></th>
+                        <th>Email <span class="sort-btn" data-attr="email" data-direction=""></span></th>
+                        <th>Age <span class="sort-btn" data-attr="age" data-direction=""></span></th>
+
+<!--                        <th th:if="${mapDirection.get('id') == 'asc'}"> ID <a href="#" th:href="'/users/list/?sortField=id&sortDirection=desc'" > &#x21e9; </a></th>&ndash;&gt;-->
+<!--                        <th th:unless="${mapDirection.get('id') == 'asc'}"> ID <a href="#" th:href="'/users/list/?sortField=id&sortDirection=asc'" > &#x21e7; </a></th>-->
+
+
+<!--                        <th th:if="${mapDirection.get('firstName') == 'asc'}"> First Name <a href="#" th:href="'/users/list/?sortField=firstName&sortDirection=desc'" > &#x21e9; </a></th>-->
+<!--                        <th th:unless="${mapDirection.get('firstName') == 'asc'}"> First Name <a href="#" th:href="'/users/list/?sortField=firstName&sortDirection=asc'" > &#x21e7; </a></th>-->
+
+<!--                        <th th:if="${mapDirection.get('lastName') == 'asc'}"> Last Name <a href="#" th:href="'/users/list/?sortField=lastName&sortDirection=desc'" > &#x21e9; </a></th>-->
+<!--                        <th th:unless="${mapDirection.get('lastName') == 'asc'}"> Last Name <a href="#" th:href="'/users/list/?sortField=lastName&sortDirection=asc'" > &#x21e7; </a></th>-->
+
+<!--                        <th th:if="${mapDirection.get('email') == 'asc'}"> Email <a href="#" th:href="'/users/list/?sortField=email&sortDirection=desc'" > &#x21e9; </a></th>-->
+<!--                        <th th:unless="${mapDirection.get('email') == 'asc'}"> Email <a href="#" th:href="'/users/list/?sortField=email&sortDirection=asc'" > &#x21e7; </a></th>-->
+
+<!--                        <th th:if="${mapDirection.get('age') == 'asc'}"> Age <a href="#" th:href="'/users/list/?sortField=age&sortDirection=desc'" > &#x21e9; </a></th>-->
+<!--                        <th th:unless="${mapDirection.get('age') == 'asc'}"> Age <a href="#" th:href="'/users/list/?sortField=age&sortDirection=asc'" > &#x21e7; </a></th>-->
+
+
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -63,7 +85,8 @@
                             <a href="#" th:href="@{/users/list/edit/{id}(id=${user.id})}" class="mr-sm-2 text-primary">
                                 <i class="fa fa-pencil"></i>
                             </a>
-                            <a href="#" th:href="@{/users/list/delete/{id}(id=${user.id})}" class="text-danger">
+<!--                            <a th:onclick="confirmDelete()">-->
+                            <a href="#" onclick="confirmDelete(event)" th:href="@{/users/list/delete/{id}(id=${user.id})}" class="text-danger">
                                 <i class="fa fa-trash"></i>
                             </a>
                         </td>
@@ -80,31 +103,109 @@
         Total Items: [[${totalItems}]]
         &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
 
-        <a th:if="${currentPage > 1}" th:href="@{'/users/list/1?sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">First</a>
+        <a th:if="${currentPage > 1}" th:href="@{'/users/list/1/' + '?term=' + ${term}  + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">First</a>
         <span th:unless="${currentPage > 1}">First</span>
         &nbsp;&nbsp;
 
-        <a th:if="${currentPage > 1}" th:href="@{'/users/list/' + ${currentPage - 1} + '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">Previous</a>
+        <a th:if="${currentPage > 1}" th:href="@{'/users/list/' + ${currentPage - 1} + '?term=' + ${term}   + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">Previous</a>
         <span th:unless="${currentPage > 1}">Previous</span>
 
         &nbsp;&nbsp;
 
         <span th:each="i: ${#numbers.sequence(1, totalPages)}">
-			<a th:if="${currentPage != i}" th:href="@{'/users/list/' + ${i} + '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">[[${i}]]</a>
+			<a th:if="${currentPage != i}" th:href="@{'/users/list/' + ${i} + '?term=' + ${term} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">[[${i}]]</a>
 			<span th:unless="${currentPage != i}">[[${i}]]</span>
 			&nbsp;
 		</span>
 
-        <a th:if="${currentPage < totalPages}" th:href="@{'/users/list/' + ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">Next</a>
+        <a th:if="${currentPage < totalPages}" th:href="@{'/users/list/' + ${currentPage + 1} + '?term=' + ${term} +'&sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">Next</a>
         <span th:unless="${currentPage < totalPages}">Next</span>
         &nbsp;&nbsp;
 
-        <a th:if="${currentPage < totalPages}" th:href="@{'/users/list/' + ${totalPages} + '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">Last</a>
+        <a th:if="${currentPage < totalPages}" th:href="@{'/users/list/' + ${totalPages} + '?term=' + ${term} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDir}}">Last</a>
         <span th:unless="${currentPage < totalPages}">Last</span>
     </div>
 </div><!-- /.container -->
 
 <footer th:replace="layout :: footer"></footer>
+<script>
 
+    let filter = {};
+    if (window.location.search) {
+        let keys = window.location.search.slice(1).split('&');
+        let sortField = [], sortDirection = [];
+        for (const key of keys) {
+            const parts = key.split('=');
+            if (parts[0] == 'sortField') sortField = parts[1].split(',');
+            if (parts[0] == 'sortDirection') sortDirection = parts[1].split(',');
+            if (parts[0] == 'term') filter['term'] = parts[1];
+        }
+        sortField.forEach((field, index) => filter[field] = sortDirection[index])
+    }
+
+
+    let arrows = { 'asc': "&#x21e7;", 'desc': "&#x21e9;" };
+    let changeDirection = (current) => current == 'asc' ? 'desc' : 'asc';
+    const sortButton = document.querySelectorAll('.sort-btn');
+
+    const buildQuery = (filterMap) => {
+        let sortField = [], sortDirection = [], term = [];
+        for (const [k, v] of Object.entries(filterMap)) {
+            if (!v) continue;
+            if (k == 'term') {
+                term.push(v);
+                continue
+            }
+            sortField.push(k);
+            sortDirection.push(v);
+
+        }
+        let query = [];
+        if (sortField.length) query.push(`sortField=${sortField.join(',')}`);
+        if (sortDirection.length) query.push(`sortDirection=${sortDirection.join(',')}`);
+        if (term.length) query.push(`term=${term.join(',')}`)
+        if (!query.length) return;
+        location.href = window.origin + window.location.pathname.replace(/\d+/g,'') + '?' + query.join('&');
+    }
+
+    sortButton.forEach(button => {
+        let { attr } = button.dataset;
+        if (filter[attr]) {
+            button.dataset.direction = filter[attr];
+            button.innerHTML = arrows[filter[attr]];
+        } else {
+            button.innerHTML = arrows['asc'];
+            button.dataset.direction = 'asc';
+        }
+        button.addEventListener('click', e => {
+            e.preventDefault();
+            let el = e.currentTarget;
+            filter[attr] = changeDirection(el.dataset.direction);
+            el.innerHTML = arrows[filter[attr]];
+            el.dataset.direction = filter[attr];
+            buildQuery(filter);
+        })
+    })
+
+    let searchButton = document.querySelector('.search-button');
+    let searchInput = searchButton.parentElement.querySelector('input[type="search"]');
+    if (filter[searchInput.name]) searchInput.value = filter[searchInput.name];
+    searchButton.addEventListener('click', e => {
+        e.preventDefault();
+        filter[searchInput.name] = searchInput.value;
+        buildQuery(filter);
+    });
+
+    function confirmDelete(e){
+        // window.c/*/onfirm("Are you sure ?")
+        if (confirm("Are you sure ?")) {
+
+        } else {
+            e.preventDefault();
+        }
+
+        // th:onclick= th:href="@{/users/list/edit/{id}(id=${user.id})}
+    }
+</script>
 </body>
 </html>
